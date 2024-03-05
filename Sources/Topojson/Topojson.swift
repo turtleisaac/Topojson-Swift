@@ -121,7 +121,13 @@ public struct Topojson {
             throw Error.invalidFile
         }
         
-        let properties = object["properties"] as? [String: String] ?? [:]
+        let properties = object["properties"] as? NSDictionary ?? [:]
+        
+        var newProperties = [String : String]()
+        
+        for key in properties.allKeys {
+            newProperties["\(key)"] = "\(properties[key]!)"
+        }
 
         
         switch(type) {
@@ -131,7 +137,7 @@ public struct Topojson {
             }
 
             return TopojsonPointObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 coordinates: (coords[0], coords[1])
             )
@@ -144,7 +150,7 @@ public struct Topojson {
             let tuples = coords.map{ coord in (coord[0], coord[1]) }
             
             return TopojsonMultiPointObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 coordinates: tuples
             )
@@ -155,7 +161,7 @@ public struct Topojson {
             }
 
             return TopojsonLineStringObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 arcs: arcs
             )
@@ -166,7 +172,7 @@ public struct Topojson {
             }
 
             return TopojsonMultiLineStringObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 arcs: arcs
             )
@@ -176,7 +182,7 @@ public struct Topojson {
             }
 
             return TopojsonPolygonObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 arcs: arcs
             )
@@ -187,7 +193,7 @@ public struct Topojson {
             }
             
             return TopojsoMultiPolygonObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 arcs: arcs)
             
@@ -197,7 +203,7 @@ public struct Topojson {
             }
             
             return TopojsonGeometryCollectionObject(
-                properties: properties,
+                properties: newProperties,
                 type: type,
                 geometries: try geometries.map { object in try Topojson.extractObject(object: object) }
             )
